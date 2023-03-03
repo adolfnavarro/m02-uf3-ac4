@@ -2,7 +2,7 @@
 """
 Created on February 2023
 
-@author: Albert ETPX
+@author: Albert ETPX  and modified by Adolf Navarro
 """
 
 # Importación de módulos externos
@@ -14,9 +14,10 @@ from flask import Flask,render_template,request;
 # connectBD: conecta a la base de datos users en MySQL
 def connectBD():
     db = mysql.connector.connect(
-        host = "localhost",
+        # host = "localhost",
+        host="127.0.0.1",
         user = "root",
-        passwd = "claumestra",
+        passwd = "holamundo1984",
         database = "users"
     )
     return db
@@ -56,10 +57,11 @@ def checkUser(user,password):
     bd=connectBD()
     cursor=bd.cursor()
 
-    query=f"SELECT user,name,surname1,surname2,age,genre FROM users WHERE user='{user}'\
-            AND password='{password}'"
-    print(query)
-    cursor.execute(query)
+    query=f"SELECT user,name,surname1,surname2,age,genre FROM users WHERE user=%s\
+            AND password=%s"
+    values=(user,password)
+    print(query,values)
+    cursor.execute(query,values)
     userData = cursor.fetchall()
     bd.close()
     
@@ -70,7 +72,17 @@ def checkUser(user,password):
 
 # cresteUser: crea un nuevo usuario en la BD
 def createUser(user,password,name,surname1,surname2,age,genre):
-    
+    bd=connectBD()
+    cursor=bd.cursor()
+    query = f"INSERT INTO users \
+            VALUES(%s,%s,%s,%s,%s,%s,%s);"
+    age=int(age)
+    values=(user,password,name,surname1,surname2,age,genre)
+    print(type(user))
+    print(type(age))
+    cursor.execute(query,values)
+    bd.commit()
+    bd.close()
     return
 
 # Secuencia principal: configuración de la aplicación web ##########################################
@@ -89,7 +101,7 @@ def login():
 
 @app.route("/signin")
 def signin():
-    return "SIGN IN PAGE"
+    return render_template("signin.html")
 
 @app.route("/results",methods=('GET', 'POST'))
 def results():
@@ -103,7 +115,22 @@ def results():
             return render_template("results.html",login=False)
         else:
             return render_template("results.html",login=True,userData=userData)
-        
+
+@app.route("/newUser",methods=('GET', 'POST'))
+def newUser():
+    if request.method == ('POST'):
+        formData = request.form
+        user=formData['usuario']
+        password=formData['contraseña']
+        name=formData['nombre']
+        surname1=formData['apellido1']
+        surname2=formData['apellido2']
+        age=formData['edad']
+        genre=formData['genero']
+        createUser(user,password,name,surname1,surname2,age,genre)    
+        return render_template("home.html")
+    
+           
 # Configuración y arranque de la aplicación web
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.run(host='localhost', port=5000, debug=True)
