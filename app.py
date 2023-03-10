@@ -17,7 +17,7 @@ def connectBD():
         # host = "localhost",
         host="127.0.0.1",
         user = "root",
-        passwd = "holamundo1984",
+        passwd = "sdfasdfasdfasdfasdfasdfasdfasdfasdfsadfsadfsadfsadfasdfsadf",
         database = "users"
     )
     return db
@@ -352,7 +352,7 @@ def EjercicioBigDATA(edad,sexo):
     from matplotlib import pyplot as plt
     fig, axs = plt.subplots(1,2,figsize=(13,7)) 
         # # Configuro  sistema d'eixos 
-    plt.title("Piramide Poblacional")     
+    fig.suptitle('Piramide poblacional', fontsize=16)         
     
 
     # Printar la barra de edad que pertoque de la persona en amarillo
